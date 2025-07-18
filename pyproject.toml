@@ -1,0 +1,11 @@
+[project]
+name = "hexlet-code"
+version = "0.1.0"
+description = "Page Analyser Trainee Project"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "flake8",
+    "gunicorn>=23.0.0",
+]
