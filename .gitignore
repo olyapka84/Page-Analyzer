@@ -43,3 +43,5 @@ pip-log.txt
 
 # Cast recording file
 demo.cast
+
+.env
