@@ -1,8 +1,15 @@
-from flask import Flask
+from flask import Flask, render_template
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    return 'Welcome to Page Analyzer!'
+    return render_template('index.html')
+
+
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
