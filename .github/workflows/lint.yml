@@ -27,4 +27,4 @@ jobs:
         run: uv pip install .
 
       - name: Run ruff
-        run: uv run ruff page_analyzer
+        run: uv run ruff check
