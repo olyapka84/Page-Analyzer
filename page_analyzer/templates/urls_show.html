@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}Информация о сайте{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">Информация о сайте</h1>
+  <table class="table" data-test="url">
+    <tr>
+      <th>ID</th>
+      <td>{{ url[0] }}</td>
+    </tr>
+    <tr>
+      <th>Имя</th>
+      <td>{{ url[1] }}</td>
+    </tr>
+    <tr>
+      <th>Дата создания</th>
+      <td>{{ url[2].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    </tr>
+  </table>
+  <a href="{{ url_for('urls_index') }}" class="btn btn-secondary">Назад</a>
+{% endblock %}
