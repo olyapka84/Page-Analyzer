@@ -4,19 +4,53 @@
 
 {% block content %}
   <h1 class="mb-4">Информация о сайте</h1>
-  <table class="table" data-test="url">
+<table class="table" data-test="url">
     <tr>
       <th>ID</th>
-      <td>{{ url[0] }}</td>
+      <td>{{ url.id }}</td>
     </tr>
     <tr>
       <th>Имя</th>
-      <td>{{ url[1] }}</td>
+      <td>{{ url.name }}</td>
     </tr>
     <tr>
       <th>Дата создания</th>
-      <td>{{ url[2].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{ url.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     </tr>
-  </table>
-  <a href="{{ url_for('urls_index') }}" class="btn btn-secondary">Назад</a>
+</table>
+<form method="post" action="{{ url_for('urls_checks', id=url.id) }}">
+    <button type="submit" class="btn btn-primary">Запустить проверку</button>
+</form>
+<h2>История проверок</h2>
+
+{% if checks %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Статус</th>
+            <th>H1</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Дата</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for check in checks %}
+        <tr>
+            <td>{{ check.id }}</td>
+            <td>{{ check.status_code or '' }}</td>
+            <td>{{ check.h1 or '' }}</td>
+            <td>{{ check.title or '' }}</td>
+            <td>{{ check.description or '' }}</td>
+            <td>{{ check.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Пока нет ни одной проверки.</p>
+{% endif %}
+
+<a href="{{ url_for('urls_index') }}" class="btn btn-secondary">Назад</a>
 {% endblock %}
