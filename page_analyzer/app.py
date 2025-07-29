@@ -70,7 +70,7 @@ def urls_add():
                 return redirect(url_for('urls_show', id=row["id"]))
 
             cursor.execute('INSERT INTO urls (name) VALUES (%s) RETURNING id;', (norm_url,))
-            new_id = cursor.fetchone()[0]
+            new_id = cursor.fetchone()["id"]
             conn.commit()
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('urls_show', id=new_id))
