@@ -35,7 +35,7 @@ def urls_index():
                 SELECT urls.id, urls.name, urls.created_at, uc.created_at AS checked_at, uc.status_code
                 FROM urls
                 LEFT JOIN (
-                    SELECT DISTINCT ON (url_id) url_id, status_code
+                    SELECT DISTINCT ON (url_id) url_id, status_code, created_at
                     FROM url_checks
                     ORDER BY url_id, created_at DESC
                 ) AS uc ON urls.id = uc.url_id
