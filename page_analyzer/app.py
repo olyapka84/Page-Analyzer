@@ -31,7 +31,16 @@ def index():
 def urls_index():
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute('SELECT * FROM urls ORDER BY id DESC;')
+            cursor.execute("""
+                SELECT urls.id, urls.name, urls.created_at, uc.status_code
+                FROM urls
+                LEFT JOIN (
+                    SELECT DISTINCT ON (url_id) url_id, status_code
+                    FROM url_checks
+                    ORDER BY url_id, created_at DESC
+                ) AS uc ON urls.id = uc.url_id
+                ORDER BY urls.id DESC;
+            """)
             urls = cursor.fetchall()
     return render_template('urls.html', urls=urls)
 
@@ -88,12 +97,14 @@ def urls_checks(id):
                 flash("Сайт не найден", "danger")
                 return redirect(url_for("urls_index"))
 
-    response = requests.get(url["name"])
-    soup = BeautifulSoup(response.text, 'html.parser')
-    response.raise_for_status()
-    if response.status_code >= 400:
+    try:
+        response = requests.get(url["name"])
+        response.raise_for_status()
+    except requests.RequestException:
         flash("Произошла ошибка при проверке", "danger")
         return redirect(url_for("urls_show", id=id))
+
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     title = soup.title.string if soup.title else ''
     h1 = soup.h1.get_text(strip=True) if soup.h1 else ''
@@ -111,5 +122,6 @@ def urls_checks(id):
                 """,
                 (id, response.status_code, h1, title, description, datetime.now())
             )
-    flash("Проверка успешно выполнена", "success")
+            conn.commit()
+    flash("Страница успешно проверена", "success")
     return redirect(url_for("urls_show", id=id))
