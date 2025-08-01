@@ -14,14 +14,26 @@
       </tr>
     </thead>
     <tbody>
-      {% for url in urls %}
+      {% if urls %}
+        {% for url in urls %}
+          <tr>
+            <td>{{ url.id }}</td>
+            <td><a href="{{ url_for('urls_show', id=url.id) }}">{{ url.name }}</a></td>
+            <td>
+              {% if url.checked_at %}
+                {{ url.checked_at.strftime('%Y-%m-%d %H:%M:%S') }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ url.status_code or '' }}</td>
+          </tr>
+        {% endfor %}
+      {% else %}
         <tr>
-          <td>{{ url.id }}</td>
-          <td><a href="{{ url_for('urls_show', id=url.id) }}">{{ url.name }}</a></td>
-          <td>{{ url.checked_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-          <td>{{ url.status_code or '' }}</td>
+          <td colspan="4" class="text-center">Список сайтов пуст</td>
         </tr>
-      {% endfor %}
+      {% endif %}
     </tbody>
   </table>
 {% endblock %}
