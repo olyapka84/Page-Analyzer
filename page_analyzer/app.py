@@ -7,6 +7,7 @@ from psycopg2.extras import RealDictCursor
 from urllib.parse import urlparse
 import validators
 import requests
+from bs4 import BeautifulSoup
 
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -88,20 +89,28 @@ def urls_checks(id):
                 return redirect(url_for("urls_index"))
 
     response = requests.get(url["name"])
+    soup = BeautifulSoup(response.text, 'html.parser')
     response.raise_for_status()
     status_code = response.status_code
     if response.status_code >= 400:
         flash("Произошла ошибка при проверке", "danger")
         return redirect(url_for("urls_show", id=id))
 
+    title = soup.title.string if soup.title else ''
+    h1 = soup.h1.get_text(strip=True) if soup.h1 else ''
+    description = ''
+    meta = soup.find('meta', attrs={'name': 'description'})
+    if meta and meta.get('content'):
+        description = meta['content']
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-                INSERT INTO url_checks (url_id, status_code, created_at)
-                VALUES (%s, %s, %s)
+                INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (id, status_code, datetime.now())
+                (id, response.status_code, h1, title, description, datetime.now())
             )
     flash("Проверка успешно выполнена!", "success")
     return redirect(url_for("urls_show", id=id))
