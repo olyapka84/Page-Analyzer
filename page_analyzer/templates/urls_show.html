@@ -29,34 +29,39 @@
 </form>
 <h2>История проверок</h2>
 
-{% if checks %}
-<table data-test="checks">
-    <thead>
+<h2>История проверок</h2>
+
+<table data-test="checks" class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Статус</th>
+      <th>H1</th>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Дата</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if checks %}
+      {% for check in checks %}
         <tr>
-            <th>ID</th>
-            <th>Статус</th>
-            <th>H1</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Дата</th>
+          <td>{{ check.id }}</td>
+          <td>{{ check.status_code or '' }}</td>
+          <td>{{ check.h1 or '' }}</td>
+          <td>{{ check.title or '' }}</td>
+          <td>{{ check.description or '' }}</td>
+          <td>{{ check.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
         </tr>
-    </thead>
-    <tbody>
-        {% for check in checks %}
-        <tr>
-            <td>{{ check.id }}</td>
-            <td>{{ check.status_code or '' }}</td>
-            <td>{{ check.h1 or '' }}</td>
-            <td>{{ check.title or '' }}</td>
-            <td>{{ check.description or '' }}</td>
-            <td>{{ check.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="6" class="text-center">Пока нет ни одной проверки.</td>
+      </tr>
+    {% endif %}
+  </tbody>
 </table>
-{% else %}
-<p>Пока нет ни одной проверки.</p>
-{% endif %}
+
 
 <a href="{{ url_for('urls_index') }}" class="btn btn-secondary">Назад</a>
 {% endblock %}
