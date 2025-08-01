@@ -91,7 +91,6 @@ def urls_checks(id):
     response = requests.get(url["name"])
     soup = BeautifulSoup(response.text, 'html.parser')
     response.raise_for_status()
-    status_code = response.status_code
     if response.status_code >= 400:
         flash("Произошла ошибка при проверке", "danger")
         return redirect(url_for("urls_show", id=id))
