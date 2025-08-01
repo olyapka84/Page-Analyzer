@@ -32,7 +32,7 @@ def urls_index():
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
-                SELECT urls.id, urls.name, urls.created_at, uc.status_code
+                SELECT urls.id, urls.name, urls.created_at, uc.created_at AS checked_at, uc.status_code
                 FROM urls
                 LEFT JOIN (
                     SELECT DISTINCT ON (url_id) url_id, status_code
