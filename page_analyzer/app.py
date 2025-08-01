@@ -6,6 +6,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from urllib.parse import urlparse
 import validators
+import requests
 
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -79,13 +80,28 @@ def urls_add():
 @app.route('/urls/<int:id>/checks', methods=['POST'])
 def urls_checks(id):
     with get_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute('SELECT * FROM urls WHERE id = %s;', (id,))
+            url = cursor.fetchone()
+            if url is None:
+                flash("Сайт не найден", "danger")
+                return redirect(url_for("urls_index"))
+
+    response = requests.get(url["name"])
+    response.raise_for_status()
+    status_code = response.status_code
+    if response.status_code >= 400:
+        flash("Произошла ошибка при проверке", "danger")
+        return redirect(url_for("urls_show", id=id))
+
+    with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-                INSERT INTO url_checks (url_id, created_at)
-                VALUES (%s, %s)
+                INSERT INTO url_checks (url_id, status_code, created_at)
+                VALUES (%s, %s, %s)
                 """,
-                (id, datetime.now())
+                (id, status_code, datetime.now())
             )
-    flash("Проверка успешно добавлена", "success")
+    flash("Проверка успешно выполнена", "success")
     return redirect(url_for("urls_show", id=id))
