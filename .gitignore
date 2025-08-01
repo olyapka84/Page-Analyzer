@@ -45,3 +45,4 @@ pip-log.txt
 demo.cast
 
 .env
+.ruff.toml

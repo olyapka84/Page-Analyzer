@@ -32,7 +32,8 @@ def urls_index():
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
-                SELECT urls.id, urls.name, urls.created_at, uc.created_at AS checked_at, uc.status_code
+                SELECT urls.id, urls.name, urls.created_at,
+                uc.created_at AS checked_at, uc.status_code
                 FROM urls
                 LEFT JOIN (
                     SELECT DISTINCT ON (url_id) url_id, status_code, created_at
@@ -80,7 +81,8 @@ def urls_add():
                 flash('Страница уже существует', 'info')
                 return redirect(url_for('urls_show', id=row["id"]))
 
-            cursor.execute('INSERT INTO urls (name) VALUES (%s) RETURNING id;', (norm_url,))
+            cursor.execute('INSERT INTO urls (name) VALUES (%s) RETURNING id;',
+                           (norm_url,))
             new_id = cursor.fetchone()["id"]
             conn.commit()
             flash('Страница успешно добавлена', 'success')
@@ -117,10 +119,12 @@ def urls_checks(id):
         with conn.cursor() as cursor:
             cursor.execute(
                 """
-                INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
+                INSERT INTO url_checks (url_id, status_code, h1,
+                title, description, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (id, response.status_code, h1, title, description, datetime.now())
+                (id, response.status_code, h1, title, description,
+                 datetime.now())
             )
             conn.commit()
     flash("Страница успешно проверена", "success")
