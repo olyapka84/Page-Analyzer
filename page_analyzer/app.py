@@ -112,5 +112,5 @@ def urls_checks(id):
                 """,
                 (id, response.status_code, h1, title, description, datetime.now())
             )
-    flash("Проверка успешно выполнена!", "success")
+    flash("Проверка успешно выполнена", "success")
     return redirect(url_for("urls_show", id=id))
