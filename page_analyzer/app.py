@@ -1,24 +1,17 @@
-from datetime import datetime
 from flask import Flask, render_template, request, flash, redirect, url_for
-from dotenv import load_dotenv
-import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from urllib.parse import urlparse
-import validators
+from datetime import datetime
 import requests
-from bs4 import BeautifulSoup
+import os
+from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
+
+from page_analyzer.database import get_connection
+from page_analyzer.parser import parse_html
+from page_analyzer.url_validator import is_valid_url, normalize_url
 
 load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL)
-
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 
@@ -33,7 +26,7 @@ def urls_index():
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
                 SELECT urls.id, urls.name, urls.created_at,
-                uc.created_at AS checked_at, uc.status_code
+                       uc.created_at AS checked_at, uc.status_code
                 FROM urls
                 LEFT JOIN (
                     SELECT DISTINCT ON (url_id) url_id, status_code, created_at
@@ -67,11 +60,11 @@ def urls_show(id):
 @app.route('/urls', methods=['POST'])
 def urls_add():
     url = request.form.get('url')
-    if not validators.url(url) or len(url) > 255:
+    if not is_valid_url(url):
         flash('Некорректный URL', 'danger')
         return render_template('index.html'), 422
 
-    norm_url = urlparse(url)._replace(path='', query='', fragment='').geturl()
+    norm_url = normalize_url(url)
 
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -81,12 +74,14 @@ def urls_add():
                 flash('Страница уже существует', 'info')
                 return redirect(url_for('urls_show', id=row["id"]))
 
-            cursor.execute('INSERT INTO urls (name) VALUES (%s) RETURNING id;',
-                           (norm_url,))
+            cursor.execute(
+                'INSERT INTO urls (name) VALUES (%s) RETURNING id;',
+                (norm_url,))
             new_id = cursor.fetchone()["id"]
             conn.commit()
-            flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('urls_show', id=new_id))
+
+    flash('Страница успешно добавлена', 'success')
+    return redirect(url_for('urls_show', id=new_id))
 
 
 @app.route('/urls/<int:id>/checks', methods=['POST'])
@@ -106,26 +101,19 @@ def urls_checks(id):
         flash("Произошла ошибка при проверке", "danger")
         return redirect(url_for("urls_show", id=id))
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    title = soup.title.string if soup.title else ''
-    h1 = soup.h1.get_text(strip=True) if soup.h1 else ''
-    description = ''
-    meta = soup.find('meta', attrs={'name': 'description'})
-    if meta and meta.get('content'):
-        description = meta['content']
+    h1, title, description = parse_html(response.text)
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
                 INSERT INTO url_checks (url_id, status_code, h1,
-                title, description, created_at)
+                                        title, description, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (id, response.status_code, h1, title, description,
-                 datetime.now())
+                (id, response.status_code, h1, title, description, datetime.now())
             )
             conn.commit()
+
     flash("Страница успешно проверена", "success")
     return redirect(url_for("urls_show", id=id))
