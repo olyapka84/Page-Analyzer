@@ -111,7 +111,8 @@ def urls_checks(id):
                                         title, description, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (id, response.status_code, h1, title, description, datetime.now())
+                (id, response.status_code, h1, title, description,
+                 datetime.now())
             )
             conn.commit()
 
