@@ -11,6 +11,9 @@ build:
 	./build.sh
 
 render-start:
+	psql "$$DATABASE_URL" -tAc "SELECT to_regclass('public.urls');" | grep -q urls \
+		&& echo 'Tables already exist, skipping database.sql' \
+		|| psql "$$DATABASE_URL" -v ON_ERROR_STOP=1 -f database.sql
 	gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
 
 PORT ?= 8000
