@@ -11,10 +11,14 @@ build:
 	./build.sh
 
 render-start:
-	psql "$$DATABASE_URL" -tAc "SELECT to_regclass('public.urls');" | grep -q urls \
-		&& echo 'Schema exists, skipping database.sql' \
+	bash -lc 'for i in {1..15}; do psql "$$DATABASE_URL" -tAc "select 1" && exit 0; echo "DB not ready, retry $$i"; sleep 2; done; exit 1'
+
+	psql "$$DATABASE_URL" -tAc "select to_regclass($$public.urls$$)" | grep -q urls \
+		&& echo "Schema exists, skipping database.sql" \
 		|| psql "$$DATABASE_URL" -v ON_ERROR_STOP=1 -f database.sql
+
 	gunicorn -w 3 -b 0.0.0.0:$(PORT) page_analyzer:app
+
 
 PORT ?= 8000
 
