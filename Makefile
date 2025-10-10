@@ -11,7 +11,7 @@ build:
 	./build.sh
 
 render-start:
-	PGSSLMODE=require psql "$$DATABASE_URL" -tAc "SELECT to_regclass('public.urls');" | grep -q urls \
+	psql "$$DATABASE_URL" -tAc "SELECT to_regclass('public.urls');" | grep -q urls \
 		&& echo 'Schema exists, skipping database.sql' \
 		|| PGSSLMODE=require psql "$$DATABASE_URL" -v ON_ERROR_STOP=1 -f database.sql
 	gunicorn -w 3 -b 0.0.0.0:$(PORT) page_analyzer:app
