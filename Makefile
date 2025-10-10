@@ -10,9 +10,7 @@ lint:
 build:
 	./build.sh
 
-# 👇 старт с безопасным init БД
 render-start:
-	# если таблица есть — пропустим init
 	psql "$$DATABASE_URL" -tAc "SELECT to_regclass('public.urls');" | grep -q urls \
 		&& echo 'Schema exists, skipping database.sql' \
 		|| psql "$$DATABASE_URL" -v ON_ERROR_STOP=1 -f database.sql
