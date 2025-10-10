@@ -1,6 +1,5 @@
 ### Tests status:
 [![Actions Status](https://github.com/Olyapka84/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Olyapka84/python-project-83/actions)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=olyapka84_python-project-83&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=olyapka84_python-project-83)
 
 # Page Analyzer
 
