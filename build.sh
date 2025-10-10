@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
+set -euo pipefail
+
+if ! command -v uv >/dev/null 2>&1; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
+fi
+
 make install
-psql -a -d "$DATABASE_URL" -f database.sql
