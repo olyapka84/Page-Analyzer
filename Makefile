@@ -25,7 +25,7 @@ render-start:
 		psql "$$DATABASE_URL_CLEAN" -tAc "select to_regclass($$public.urls$$)" | grep -q urls \
 			&& echo "Schema exists, skipping database.sql" \
 			|| psql "$$DATABASE_URL_CLEAN" -v ON_ERROR_STOP=1 -f database.sql; \
-		exec gunicorn -w 3 -b 0.0.0.0:$(PORT) page_analyzer:app \
+		exec gunicorn -w 2 -b 0.0.0.0:$(PORT) page_analyzer:app
 	'
 
 PORT ?= 8000
