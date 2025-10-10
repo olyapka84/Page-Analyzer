@@ -9,7 +9,7 @@
 
 **Page Analyzer** is a web application built with Flask that allows users to analyze web pages for basic SEO suitability — similar to Google's PageSpeed Insights.
 
-This project is part of a backend development curriculum and demonstrates:
+This project is part of a backend development curriculum and demonstrates: 
 
 - The basics of **MVC architecture**
 - Handling **HTTP requests**, **routing**, and using a **template engine (Jinja2)**
