@@ -32,11 +32,7 @@ This project is part of a backend development curriculum and demonstrates:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/python-project-83.git
-cd python-project-83
-
 # Install dependencies
 uv pip install .
-
 # Run locally
 uv run flask --app page_analyzer run
