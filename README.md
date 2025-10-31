@@ -32,6 +32,7 @@ This project is part of a backend development curriculum and demonstrates:
 
 ```bash
 # Clone the repository
+https://github.com/Olyapka84/Page-Analyzer.git
 # Install dependencies
 uv pip install .
 # Run locally
