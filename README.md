@@ -1,10 +1,6 @@
 ### Test status:
 [![Actions Status](https://github.com/Olyapka84/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Olyapka84/python-project-83/actions)
 
-# Page Analyzer
-
-[Live Demo on Render](https://python-project-83-olyapka.onrender.com/)
-
 ## 📌 About the Project
 
 **Page Analyzer** is a web application built with Flask that allows users to analyze web pages for basic SEO suitability — similar to Google's PageSpeed Insights.
